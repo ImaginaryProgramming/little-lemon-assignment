@@ -7,6 +7,9 @@ import {
   Pressable,
   TextInput,
 } from "react-native";
+import Checkbox from "./components/Checkbox";
+import PhoneNumberInput from "./components/PhoneNumberInput";
+import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function Profile() {
@@ -75,7 +78,7 @@ export default function Profile() {
   };
 
   return (
-    <View>
+    <ScrollView>
       <View style={styles.header}>
         <Pressable style={styles.backButton} onPress={handleBackPress}>
           <Icon name={"arrow-back"} size={20} color={"#ffffff"} />
@@ -155,14 +158,32 @@ export default function Profile() {
         />
         <View style={{ height: 16 }} />
         <Text style={styles.label}>Phone number</Text>
-        <TextInput
-          style={[styles.input, phoneError ? styles.errorInput : null]}
-          onChangeText={handleChangePhone}
-          defaultValue={phone}
-          placeholder="555-555-5555"
-        />
+        <PhoneNumberInput />
+        <View style={{ height: 16 }} />
+        <Text style={styles.headerText}>Email notifications</Text>;
+        <View style={{ height: 16 }} />
+        <Checkbox label={"Order statuses"} />
+        <View style={{ height: 8 }} />
+        <Checkbox label={"Password changes"} />
+        <View style={{ height: 8 }} />
+        <Checkbox label={"Special offers"} />
+        <View style={{ height: 8 }} />
+        <Checkbox label={"Newsletter"} />
+        <View style={{ height: 16 }} />
+        <Pressable style={styles.logOutButton}>
+          <Text style={styles.logOutButtonText}>Log Out</Text>
+        </Pressable>
+        <View style={{ height: 16 }} />
+        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+          <Pressable style={styles.outlineButton}>
+            <Text style={styles.outlineButtonText}>Discard</Text>
+          </Pressable>
+          <Pressable style={styles.primaryButton}>
+            <Text style={styles.primaryButtonText}>Save</Text>
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -190,10 +211,10 @@ const styles = StyleSheet.create({
   },
   littleLemon: {
     color: "#495e57",
-    marginLeft: 4,
+    marginLeft: 8,
     marginVertical: "auto",
     textAlign: "center",
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: "bold",
   },
   logo: {
@@ -245,6 +266,18 @@ const styles = StyleSheet.create({
   outlineButtonText: {
     fontWeight: "500",
     color: "#4b4d4f",
+  },
+  logOutButton: {
+    height: 40,
+    width: "100%",
+    backgroundColor: "#f4ce14",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  logOutButtonText: {
+    fontWeight: "bold",
+    color: "#111111",
   },
   input: {
     height: 50,
