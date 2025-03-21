@@ -67,4 +67,8 @@ export default StyleSheet.create({
     borderColor: "red",
     color: "red",
   },
+  divider: {
+    height: 1,
+    backgroundColor: "#ccc",
+  },
 });

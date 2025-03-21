@@ -1,6 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { FlatList, ScrollView } from "react-native-gesture-handler";
+import { View, Text, StyleSheet, Image } from "react-native";
+import { FlatList, Pressable, ScrollView } from "react-native-gesture-handler";
 import LittleLemonHeader from "../components/LittleLemonHeader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MenuItem from "../components/MenuItem";
@@ -11,13 +11,16 @@ import {
   saveMenuItems,
   clearMenuItems,
 } from "../data/database";
+import CommonStyles from "../CommonStyles";
 
 export default function Home() {
   const [profileImg, setProfileImg] = React.useState("");
   const [menu, setMenu] = React.useState([]);
+  const [selectedCategories, setSelectedCategories] = React.useState([]);
+  const [categories, setCategories] = React.useState([]);
 
+  // Load async data
   React.useEffect(() => {
-    // Load profile image from AsyncStorage
     AsyncStorage.getItem("profile_img", (_) => {}).then((val) => {
       setProfileImg(val);
     });
@@ -46,21 +49,98 @@ export default function Home() {
         console.error("Error loading menu:", e);
       }
     }
-    fetchData();
+    fetchData().then(async () => {
+      const cats = menu.map((item) => item.category.toLowerCase());
+      setCategories([...new Set(cats)]);
+    });
   }, []);
 
   const handleBackPress = () => {
     // TODO Pop
   };
 
+  const toggleCategory = (category) => {
+    category = category.toLowerCase();
+    setSelectedCategories((prevSelected) => {
+      if (prevSelected.includes(category)) {
+        return prevSelected.filter((cat) => cat != category);
+      } else {
+        return [...prevSelected, category];
+      }
+    });
+  };
+
+  const filteredMenu = menu.filter((item) => {
+    if (selectedCategories.length == 0) {
+      return true;
+    } else {
+      return selectedCategories.includes(item.category.toLowerCase());
+    }
+  });
+
   return (
-    <ScrollView>
+    <ScrollView style={{ backgroundColor: "white" }}>
       <LittleLemonHeader
         handleBackPress={handleBackPress}
         profileImg={profileImg}
       />
+
+      <View style={styles.bannerContainer}>
+        <Text style={styles.bannerLittleLemon}>Little Lemon</Text>
+        <View style={{ flexDirection: "row" }}>
+          <View style={{ flex: 1 }}>
+            <Text style={[CommonStyles.h1, { color: "white" }]}>Chicago</Text>
+            <Text style={styles.bannerText}>
+              We are a family owned Mediterranean restaurant, focused on
+              traditional recipes served with a modern twist.
+            </Text>
+          </View>
+          <Image
+            style={styles.bannerImage}
+            source={require("../../assets/images/chef.jpg")}
+          />
+        </View>
+        {/* TODO add search bar */}
+      </View>
+
+      <View style={styles.filteringContainer}>
+        <Text style={[CommonStyles.h1, { marginVertical: 8 }]}>
+          ORDER FOR DELIVERY!
+        </Text>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesContainer}
+        >
+          {categories.map((category) => (
+            <Pressable
+              key={category}
+              style={[
+                styles.categoryButton,
+                selectedCategories.includes(category.toLowerCase()) &&
+                  styles.selectedCategory,
+              ]}
+              onPress={() => toggleCategory(category)}
+            >
+              <Text
+                style={[
+                  styles.categoryText,
+                  selectedCategories.includes(category.toLowerCase()) &&
+                    styles.selectedCategoryText,
+                ]}
+              >
+                {category[0].toUpperCase() + category.slice(1)}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+
+      <View style={[CommonStyles.divider, { marginTop: 20 }]} />
+
       <FlatList
-        data={menu}
+        data={filteredMenu}
         renderItem={({ item }) => {
           return (
             <MenuItem
@@ -78,4 +158,50 @@ export default function Home() {
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  bannerContainer: {
+    backgroundColor: "#495E57",
+    padding: 16,
+  },
+  bannerImage: {
+    width: 100,
+    height: 100,
+    resizeMode: "cover",
+    borderRadius: 16,
+    marginVertical: "auto",
+    marginLeft: 16,
+  },
+  bannerLittleLemon: {
+    color: "#f4ce14",
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  bannerText: {
+    color: "white",
+    fontSize: 14,
+  },
+  filteringContainer: {
+    paddingHorizontal: 16,
+  },
+  categoriesContainer: {
+    flexDirection: "row",
+  },
+  categoryButton: {
+    backgroundColor: "#EDEFEE",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 100,
+    marginRight: 12,
+  },
+  selectedCategory: {
+    backgroundColor: "#495E57",
+  },
+  categoryText: {
+    color: "#495E57",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  selectedCategoryText: {
+    color: "white",
+  },
+});

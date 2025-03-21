@@ -18,7 +18,6 @@ export default function RootLayout() {
     // load auth
     AsyncStorage.getItem("isOnboardingComplete", (strValue) => {}).then(
       (strValue) => {
-        console.log("then " + strValue);
         if (strValue == null) {
           setIsOnboardingComplete(false);
         } else {

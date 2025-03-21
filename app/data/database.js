@@ -39,14 +39,6 @@ export async function getMenuItems() {
   return result;
 }
 
-export async function filterMenuItems(category) {
-  const result = await db.getAllAsync(
-    "SELECT * FROM menu_items WHERE category = ?",
-    [category]
-  );
-  return result;
-}
-
 export async function searchMenuItems(searchTerm) {
   const result = await db.getAllAsync(
     "SELECT * FROM menu_items WHERE name LIKE ? OR description LIKE ?",
