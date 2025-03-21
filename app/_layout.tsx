@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Onboarding from "./screens/Onboarding";
 import Profile from "./screens/Profile";
 import Splash from "./screens/Splash";
+import Home from "./screens/Home";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -51,9 +52,21 @@ export default function RootLayout() {
     <GestureHandlerRootView>
       <Stack.Navigator>
         {isOnboardingComplete ? (
-          <Stack.Screen name="Profile" options={{ headerShown: false }}>
-            {(props) => <Profile {...props} onLogout={handleLogout} />}
-          </Stack.Screen>
+          [
+            <Stack.Screen
+              options={{ headerShown: false }}
+              name="Home"
+              component={Home}
+              key={"home"}
+            />,
+            <Stack.Screen
+              name="Profile"
+              options={{ headerShown: false }}
+              key="profile"
+            >
+              {(props) => <Profile {...props} onLogout={handleLogout} />}
+            </Stack.Screen>,
+          ]
         ) : (
           <Stack.Screen name="Onboarding" options={{ headerShown: false }}>
             {(props) => <Onboarding onNextPressed={onNextPressed} />}

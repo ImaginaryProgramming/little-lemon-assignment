@@ -9,10 +9,12 @@ import {
 } from "react-native";
 import Checkbox from "../components/Checkbox";
 import PhoneNumberInput from "../components/PhoneNumberInput";
+import LittleLemonHeader from "../components/LittleLemonHeader";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
+import commonStyles from "../CommonStyles";
 
 export default function Profile({ onLogout }) {
   const [profileImg, setProfileImg] = React.useState("");
@@ -40,7 +42,7 @@ export default function Profile({ onLogout }) {
       setPhone(val);
     });
     AsyncStorage.getItem("profile_img", (_) => {}).then((val) => {
-      setProfile(val);
+      setProfileImg(val);
     });
     AsyncStorage.getItem("email_notifs", (_) => {}).then((val) => {
       setEmailNotifs(JSON.parse(val));
@@ -135,40 +137,14 @@ export default function Profile({ onLogout }) {
 
   return (
     <ScrollView>
-      <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={handleBackPress}>
-          <Icon name={"arrow-back"} size={20} color={"#ffffff"} />
-        </Pressable>
-        <View style={{ flexDirection: "row" }}>
-          <Image
-            style={styles.logo}
-            resizeMode="contain"
-            source={require("../../assets/images/little-lemon-logo-grey.png")}
-          />
-          <Text style={styles.littleLemon}>Little Lemon</Text>
-        </View>
-        {profileImg != "" ? (
-          <Image
-            source={{ uri: profileImg }}
-            resizeMode="cover"
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 20,
-            }}
-          />
-        ) : (
-          <Icon
-            name={"account-circle"}
-            size={42}
-            style={styles.noProfileIcon}
-          />
-        )}
-      </View>
+      <LittleLemonHeader
+        handleBackPress={handleBackPress}
+        profileImg={profileImg}
+      />
       <View style={styles.mainContainer}>
-        <Text style={styles.headerText}>Personal Information</Text>
+        <Text style={commonStyles.h1}>Personal Information</Text>
         <View style={{ height: 8 }} />
-        <Text style={styles.label}>Avatar</Text>
+        <Text style={commonStyles.label}>Avatar</Text>
         <View style={styles.avatarContainer}>
           {profileImg != "" ? (
             <Image
@@ -188,41 +164,50 @@ export default function Profile({ onLogout }) {
             />
           )}
           <Pressable
-            style={[styles.primaryButton, { marginLeft: 12 }]}
+            style={[commonStyles.primaryButton, { marginLeft: 12 }]}
             onPress={handleChangeImage}
           >
-            <Text style={styles.primaryButtonText}>Change</Text>
+            <Text style={commonStyles.primaryButtonText}>Change</Text>
           </Pressable>
-          <Pressable style={[styles.outlineButton, { marginLeft: 20 }]}>
-            <Text style={styles.outlineButtonText}>Remove</Text>
+          <Pressable style={[commonStyles.outlineButton, { marginLeft: 20 }]}>
+            <Text style={commonStyles.outlineButtonText}>Remove</Text>
           </Pressable>
         </View>
         <View style={{ height: 16 }} />
-        <Text style={styles.label}>First name</Text>
+        <Text style={commonStyles.label}>First name</Text>
         <TextInput
-          style={[styles.input, firstNameError ? styles.errorInput : null]}
+          style={[
+            commonStyles.input,
+            firstNameError ? commonStyles.errorInput : null,
+          ]}
           onChangeText={handleChangeFirstName}
           value={firstName}
         />
         <View style={{ height: 16 }} />
-        <Text style={styles.label}>Last name</Text>
+        <Text style={commonStyles.label}>Last name</Text>
         <TextInput
-          style={[styles.input, lastNameError ? styles.errorInput : null]}
+          style={[
+            commonStyles.input,
+            lastNameError ? commonStyles.errorInput : null,
+          ]}
           onChangeText={handleChangeLastName}
           value={lastName}
         />
         <View style={{ height: 16 }} />
-        <Text style={styles.label}>Email</Text>
+        <Text style={commonStyles.label}>Email</Text>
         <TextInput
-          style={[styles.input, emailError ? styles.errorInput : null]}
+          style={[
+            commonStyles.input,
+            emailError ? commonStyles.errorInput : null,
+          ]}
           onChangeText={handleChangeEmail}
           value={email}
         />
         <View style={{ height: 16 }} />
-        <Text style={styles.label}>Phone number</Text>
+        <Text style={commonStyles.label}>Phone number</Text>
         <PhoneNumberInput onValidNumber={(v) => handleChangePhone(v)} />
         <View style={{ height: 16 }} />
-        <Text style={styles.headerText}>Email notifications</Text>;
+        <Text style={commonStyles.h1}>Email notifications</Text>;
         <View style={{ height: 16 }} />
         <Checkbox
           label={"Order statuses"}
@@ -257,11 +242,11 @@ export default function Profile({ onLogout }) {
         </Pressable>
         <View style={{ height: 16 }} />
         <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
-          <Pressable style={styles.outlineButton}>
-            <Text style={styles.outlineButtonText}>Discard</Text>
+          <Pressable style={commonStyles.outlineButton}>
+            <Text style={commonStyles.outlineButtonText}>Discard</Text>
           </Pressable>
-          <Pressable style={styles.primaryButton} onPress={save}>
-            <Text style={styles.primaryButtonText}>Save</Text>
+          <Pressable style={commonStyles.primaryButton} onPress={save}>
+            <Text style={commonStyles.primaryButtonText}>Save</Text>
           </Pressable>
         </View>
       </View>
@@ -270,84 +255,15 @@ export default function Profile({ onLogout }) {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    height: 50,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 12,
-  },
   mainContainer: {
     padding: 16,
-  },
-  headerText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  label: {
-    fontSize: 12,
-    color: "#7a7b86",
-    fontWeight: "bold",
   },
   avatarContainer: {
     flexDirection: "row",
   },
-  littleLemon: {
-    color: "#495e57",
-    marginLeft: 8,
-    marginVertical: "auto",
-    textAlign: "center",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  logo: {
-    width: 40,
-    height: 40,
-    resizeMode: "contain",
-    marginVertical: "auto",
-  },
-  backButton: {
-    width: 35,
-    height: 35,
-    borderRadius: 50,
-    backgroundColor: "#495e57",
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: "auto",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-  },
   noProfileIcon: {
     color: "#495e57",
     marginVertical: "auto",
-  },
-  primaryButton: {
-    height: 40,
-    width: 100,
-    backgroundColor: "#495e57",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 8,
-    marginVertical: "auto",
-  },
-  primaryButtonText: {
-    fontWeight: "500",
-    color: "white",
-  },
-  outlineButton: {
-    height: 40,
-    width: 100,
-    borderColor: "#4b4d4f",
-    borderWidth: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 8,
-    marginVertical: "auto",
-  },
-  outlineButtonText: {
-    fontWeight: "500",
-    color: "#4b4d4f",
   },
   logOutButton: {
     height: 40,
@@ -360,18 +276,5 @@ const styles = StyleSheet.create({
   logOutButtonText: {
     fontWeight: "bold",
     color: "#111111",
-  },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    padding: 10,
-    marginVertical: 4,
-    borderRadius: 8,
-    borderColor: "#4b4d4f",
-    color: "#4b4d4f",
-  },
-  errorInput: {
-    borderColor: "red",
-    color: "red",
   },
 });

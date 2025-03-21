@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { TextInput, View, Text, StyleSheet } from "react-native";
+import { TextInput, View, Text } from "react-native";
+import commonStyles from "../CommonStyles";
 
 export default function PhoneNumberInput({ onValidNumber }) {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -44,7 +45,7 @@ export default function PhoneNumberInput({ onValidNumber }) {
         placeholder="(___) ___-____"
         keyboardType="phone-pad"
         maxLength={14}
-        style={[styles.input, !isValid ? styles.errorInput : null]}
+        style={[commonStyles.input, !isValid ? commonStyles.errorInput : null]}
       />
       {!isValid && phoneNumber.length > 0 && (
         <Text style={{ color: "red" }}>
@@ -54,19 +55,3 @@ export default function PhoneNumberInput({ onValidNumber }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  input: {
-    height: 50,
-    borderWidth: 1,
-    padding: 10,
-    marginVertical: 4,
-    borderRadius: 8,
-    borderColor: "#4b4d4f",
-    color: "#4b4d4f",
-  },
-  errorInput: {
-    borderColor: "red",
-    color: "red",
-  },
-});
