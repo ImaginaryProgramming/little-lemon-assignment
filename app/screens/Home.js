@@ -13,8 +13,10 @@ import {
 } from "../data/database";
 import CommonStyles from "../CommonStyles";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { useNavigation } from "expo-router";
 
 export default function Home() {
+  const navigation = useNavigation();
   const [profileImg, setProfileImg] = React.useState("");
   const [menu, setMenu] = React.useState([]);
   const [selectedCategories, setSelectedCategories] = React.useState([]);
@@ -58,7 +60,9 @@ export default function Home() {
   }, []);
 
   const handleBackPress = () => {
-    // TODO Pop
+    if (navigation.canGoBack()) {
+      navigation.pop();
+    }
   };
 
   const toggleCategory = (category) => {
@@ -89,6 +93,9 @@ export default function Home() {
       <LittleLemonHeader
         handleBackPress={handleBackPress}
         profileImg={profileImg}
+        handleImgPress={() => {
+          navigation.navigate("Profile");
+        }}
       />
 
       <View style={styles.bannerContainer}>

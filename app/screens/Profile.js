@@ -15,8 +15,10 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import commonStyles from "../CommonStyles";
+import { useNavigation } from "expo-router";
 
 export default function Profile({ onLogout }) {
+  const navigation = useNavigation();
   const [profileImg, setProfileImg] = React.useState("");
   const [firstName, setFirstName] = React.useState("");
   const [firstNameError, setFirstNameError] = React.useState("");
@@ -60,7 +62,7 @@ export default function Profile({ onLogout }) {
   };
 
   const handleBackPress = () => {
-    // TODO Pop
+    navigation.pop();
   };
 
   const handleLogOut = () => {
@@ -146,7 +148,7 @@ export default function Profile({ onLogout }) {
         <View style={{ height: 8 }} />
         <Text style={commonStyles.label}>Avatar</Text>
         <View style={styles.avatarContainer}>
-          {profileImg != "" ? (
+          {profileImg != null && profileImg != "" ? (
             <Image
               source={{ uri: profileImg }}
               resizeMode="cover"
