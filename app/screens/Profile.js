@@ -7,12 +7,14 @@ import {
   Pressable,
   TextInput,
 } from "react-native";
-import Checkbox from "./components/Checkbox";
-import PhoneNumberInput from "./components/PhoneNumberInput";
+import Checkbox from "../components/Checkbox";
+import PhoneNumberInput from "../components/PhoneNumberInput";
 import { ScrollView } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 
-export default function Profile() {
+export default function Profile({ onLogout }) {
   const [profileImg, setProfileImg] = React.useState("");
   const [firstName, setFirstName] = React.useState("");
   const [firstNameError, setFirstNameError] = React.useState("");
@@ -22,9 +24,45 @@ export default function Profile() {
   const [emailError, setEmailError] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [phoneError, setPhoneError] = React.useState("");
+  const [emailNotifs, setEmailNotifs] = React.useState([]);
+
+  React.useEffect(() => {
+    AsyncStorage.getItem("first_name", (_) => {}).then((val) => {
+      setFirstName(val);
+    });
+    AsyncStorage.getItem("last_name", (_) => {}).then((val) => {
+      setLastName(val);
+    });
+    AsyncStorage.getItem("email", (_) => {}).then((val) => {
+      setEmail(val);
+    });
+    AsyncStorage.getItem("phone", (_) => {}).then((val) => {
+      setPhone(val);
+    });
+    AsyncStorage.getItem("profile_img", (_) => {}).then((val) => {
+      setProfile(val);
+    });
+    AsyncStorage.getItem("email_notifs", (_) => {}).then((val) => {
+      setEmailNotifs(JSON.parse(val));
+    });
+  }, []);
+
+  const save = () => {
+    console.log("Saving");
+    AsyncStorage.setItem("first_name", firstName);
+    AsyncStorage.setItem("last_name", lastName);
+    AsyncStorage.setItem("email", email);
+    AsyncStorage.setItem("phone", phone);
+    AsyncStorage.setItem("profile_img", profileImg);
+    AsyncStorage.setItem("email_notifs", JSON.stringify(emailNotifs));
+  };
 
   const handleBackPress = () => {
     // TODO Pop
+  };
+
+  const handleLogOut = () => {
+    onLogout();
   };
 
   const handleChangeFirstName = (text) => {
@@ -63,18 +101,36 @@ export default function Profile() {
 
   const handleChangePhone = (text) => {
     setPhone(text);
-    if (!text.trim()) {
-      setPhoneError("Phone number is required");
-    } else if (!validateEmail(text)) {
-      setPhoneError("Please enter a valid U.S. phone number");
-    } else {
-      setPhoneError("");
+  };
+
+  const handleChangeImage = async () => {
+    console.log("handleChangeImage");
+
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "videos"],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setProfileImg(result.assets[0].uri);
     }
   };
 
-  const validatePhone = (email) => {
-    // const emailRegex = /^[^\s]+@[^\s]+\.[^\s]+$/;
-    // return emailRegex.test(email);
+  const handleChangeNotif = (notif, enable) => {
+    if (enable) {
+      setEmailNotifs((prev) => {
+        return [...prev, notif];
+      });
+    } else {
+      setEmailNotifs((prev) => {
+        return prev.filter((n) => n != notif);
+      });
+    }
   };
 
   return (
@@ -86,13 +142,15 @@ export default function Profile() {
         <View style={{ flexDirection: "row" }}>
           <Image
             style={styles.logo}
-            source={require("../assets/images/little-lemon-logo-grey.png")}
+            resizeMode="contain"
+            source={require("../../assets/images/little-lemon-logo-grey.png")}
           />
           <Text style={styles.littleLemon}>Little Lemon</Text>
         </View>
         {profileImg != "" ? (
           <Image
-            source={require("../assets/images/little-lemon-logo-grey.png")}
+            source={{ uri: profileImg }}
+            resizeMode="cover"
             style={{
               width: 40,
               height: 40,
@@ -114,7 +172,8 @@ export default function Profile() {
         <View style={styles.avatarContainer}>
           {profileImg != "" ? (
             <Image
-              source={require("../assets/images/little-lemon-logo-grey.png")}
+              source={{ uri: profileImg }}
+              resizeMode="cover"
               style={{
                 width: 70,
                 height: 70,
@@ -128,7 +187,10 @@ export default function Profile() {
               style={styles.noProfileIcon}
             />
           )}
-          <Pressable style={[styles.primaryButton, { marginLeft: 12 }]}>
+          <Pressable
+            style={[styles.primaryButton, { marginLeft: 12 }]}
+            onPress={handleChangeImage}
+          >
             <Text style={styles.primaryButtonText}>Change</Text>
           </Pressable>
           <Pressable style={[styles.outlineButton, { marginLeft: 20 }]}>
@@ -140,37 +202,57 @@ export default function Profile() {
         <TextInput
           style={[styles.input, firstNameError ? styles.errorInput : null]}
           onChangeText={handleChangeFirstName}
-          defaultValue={firstName}
+          value={firstName}
         />
         <View style={{ height: 16 }} />
         <Text style={styles.label}>Last name</Text>
         <TextInput
           style={[styles.input, lastNameError ? styles.errorInput : null]}
-          onChangeText={handleChangeFirstName}
-          defaultValue={lastName}
+          onChangeText={handleChangeLastName}
+          value={lastName}
         />
         <View style={{ height: 16 }} />
         <Text style={styles.label}>Email</Text>
         <TextInput
           style={[styles.input, emailError ? styles.errorInput : null]}
           onChangeText={handleChangeEmail}
-          defaultValue={email}
+          value={email}
         />
         <View style={{ height: 16 }} />
         <Text style={styles.label}>Phone number</Text>
-        <PhoneNumberInput />
+        <PhoneNumberInput onValidNumber={(v) => handleChangePhone(v)} />
         <View style={{ height: 16 }} />
         <Text style={styles.headerText}>Email notifications</Text>;
         <View style={{ height: 16 }} />
-        <Checkbox label={"Order statuses"} />
+        <Checkbox
+          label={"Order statuses"}
+          onToggle={(v) => {
+            handleChangeNotif("order_status", v);
+          }}
+        />
         <View style={{ height: 8 }} />
-        <Checkbox label={"Password changes"} />
+        <Checkbox
+          label={"Password changes"}
+          onToggle={(v) => {
+            handleChangeNotif("password_change", v);
+          }}
+        />
         <View style={{ height: 8 }} />
-        <Checkbox label={"Special offers"} />
+        <Checkbox
+          label={"Special offers"}
+          onToggle={(v) => {
+            handleChangeNotif("special_offers", v);
+          }}
+        />
         <View style={{ height: 8 }} />
-        <Checkbox label={"Newsletter"} />
+        <Checkbox
+          label={"Newsletter"}
+          onToggle={(v) => {
+            handleChangeNotif("newsletter", v);
+          }}
+        />
         <View style={{ height: 16 }} />
-        <Pressable style={styles.logOutButton}>
+        <Pressable style={styles.logOutButton} onPress={handleLogOut}>
           <Text style={styles.logOutButtonText}>Log Out</Text>
         </Pressable>
         <View style={{ height: 16 }} />
@@ -178,7 +260,7 @@ export default function Profile() {
           <Pressable style={styles.outlineButton}>
             <Text style={styles.outlineButtonText}>Discard</Text>
           </Pressable>
-          <Pressable style={styles.primaryButton}>
+          <Pressable style={styles.primaryButton} onPress={save}>
             <Text style={styles.primaryButtonText}>Save</Text>
           </Pressable>
         </View>

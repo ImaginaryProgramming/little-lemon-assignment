@@ -6,7 +6,7 @@ export default function Splash() {
     <View>
       <Image
         style={styles.logo}
-        source={require("../assets/images/little-lemon-logo-grey.png")}
+        source={require("../../assets/images/little-lemon-logo-grey.png")}
       />
     </View>
   );

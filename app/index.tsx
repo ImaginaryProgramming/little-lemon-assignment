@@ -1,6 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
-import Onboarding from "./Onboarding";
+import Onboarding from "./screens/Onboarding";
 
 export default function Index() {
   return (

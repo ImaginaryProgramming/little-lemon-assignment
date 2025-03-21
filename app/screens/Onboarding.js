@@ -1,5 +1,6 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as React from "react";
-import { View, Text, StyleSheet, Image, Button } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { Pressable, TextInput } from "react-native-gesture-handler";
 
 export default function Onboarding({ onNextPressed }) {
@@ -14,6 +15,7 @@ export default function Onboarding({ onNextPressed }) {
       setNameError("Name is required");
     } else {
       setNameError("");
+      AsyncStorage.setItem("first_name", text);
     }
   };
 
@@ -25,6 +27,7 @@ export default function Onboarding({ onNextPressed }) {
       setEmailError("Please enter a valid email address");
     } else {
       setEmailError("");
+      AsyncStorage.setItem("email", text);
     }
   };
 
@@ -45,7 +48,7 @@ export default function Onboarding({ onNextPressed }) {
       <View style={styles.header}>
         <Image
           style={styles.logo}
-          source={require("../assets/images/little-lemon-logo-grey.png")}
+          source={require("../../assets/images/little-lemon-logo-grey.png")}
         />
         <Text style={styles.littleLemon}>Little Lemon</Text>
       </View>

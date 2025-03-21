@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextInput, View, Text, StyleSheet } from "react-native";
 
-export default function PhoneNumberInput() {
+export default function PhoneNumberInput({ onValidNumber }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isValid, setIsValid] = useState(true);
 
@@ -29,7 +29,11 @@ export default function PhoneNumberInput() {
 
     // Validate phone number (only if it's a complete number)
     const phoneRegex = /^\(\d{3}\) \d{3}-\d{4}$/;
-    setIsValid(phoneRegex.test(formatted) || limited.length < 10);
+    const valid = phoneRegex.test(formatted) || limited.length == 0;
+    setIsValid(valid);
+    if (valid) {
+      onValidNumber(formatted);
+    }
   };
 
   return (

@@ -2,12 +2,17 @@ import React, { useState } from "react";
 import { Pressable, View, Text } from "react-native";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
-export default function Checkbox({ label }) {
+export default function Checkbox({ label, onToggle }) {
   const [isChecked, setIsChecked] = useState(false);
+
+  const toggle = () => {
+    setIsChecked(!isChecked);
+    onToggle(!isChecked);
+  };
 
   return (
     <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <Pressable onPress={() => setIsChecked(!isChecked)}>
+      <Pressable onPress={toggle}>
         <View
           style={{
             width: 20,

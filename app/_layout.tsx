@@ -1,7 +1,7 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Onboarding from "./Onboarding";
-import Profile from "./Profile";
-import Splash from "./Splash";
+import Onboarding from "./screens/Onboarding";
+import Profile from "./screens/Profile";
+import Splash from "./screens/Splash";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -9,7 +9,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const Stack = createNativeStackNavigator();
 
 export default function RootLayout() {
-  // const isAuthed = false;
   const [isOnboardingComplete, setIsOnboardingComplete] = useState<
     boolean | null
   >(null);
@@ -36,6 +35,14 @@ export default function RootLayout() {
     });
   };
 
+  const handleLogout = () => {
+    AsyncStorage.clear().then(() => {
+      AsyncStorage.setItem("isOnboardingComplete", "false").then(() => {
+        setIsOnboardingComplete(false);
+      });
+    });
+  };
+
   if (isOnboardingComplete == null) {
     return <Splash />;
   }
@@ -44,11 +51,9 @@ export default function RootLayout() {
     <GestureHandlerRootView>
       <Stack.Navigator>
         {isOnboardingComplete ? (
-          <Stack.Screen
-            name="Profile"
-            component={Profile}
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="Profile" options={{ headerShown: false }}>
+            {(props) => <Profile {...props} onLogout={handleLogout} />}
+          </Stack.Screen>
         ) : (
           <Stack.Screen name="Onboarding" options={{ headerShown: false }}>
             {(props) => <Onboarding onNextPressed={onNextPressed} />}
