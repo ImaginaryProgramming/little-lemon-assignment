@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TextInput } from "react-native";
 import { FlatList, Pressable, ScrollView } from "react-native-gesture-handler";
 import LittleLemonHeader from "../components/LittleLemonHeader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -12,12 +12,14 @@ import {
   clearMenuItems,
 } from "../data/database";
 import CommonStyles from "../CommonStyles";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function Home() {
   const [profileImg, setProfileImg] = React.useState("");
   const [menu, setMenu] = React.useState([]);
   const [selectedCategories, setSelectedCategories] = React.useState([]);
   const [categories, setCategories] = React.useState([]);
+  const [query, setQuery] = React.useState("");
 
   // Load async data
   React.useEffect(() => {
@@ -70,13 +72,17 @@ export default function Home() {
     });
   };
 
-  const filteredMenu = menu.filter((item) => {
-    if (selectedCategories.length == 0) {
-      return true;
-    } else {
-      return selectedCategories.includes(item.category.toLowerCase());
-    }
-  });
+  const filteredMenu = menu
+    .filter((item) => {
+      if (selectedCategories.length == 0) {
+        return true;
+      } else {
+        return selectedCategories.includes(item.category.toLowerCase());
+      }
+    })
+    .filter((item) => {
+      return item.name.toLowerCase().includes(query.toLowerCase());
+    });
 
   return (
     <ScrollView style={{ backgroundColor: "white" }}>
@@ -100,7 +106,18 @@ export default function Home() {
             source={require("../../assets/images/chef.jpg")}
           />
         </View>
-        {/* TODO add search bar */}
+        <View style={styles.searchContainer}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Icon name={"search"} size={24} style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search for a dish..."
+              onChangeText={(text) => {
+                setQuery(text);
+              }}
+            />
+          </View>
+        </View>
       </View>
 
       <View style={styles.filteringContainer}>
@@ -203,5 +220,19 @@ const styles = StyleSheet.create({
   },
   selectedCategoryText: {
     color: "white",
+  },
+  searchContainer: {
+    marginTop: 16,
+    backgroundColor: "#EDEFEE",
+    borderRadius: 8,
+    padding: 8,
+  },
+  searchInput: {
+    borderRadius: 8,
+    padding: 8,
+    fontSize: 16,
+  },
+  searchIcon: {
+    color: "#333",
   },
 });

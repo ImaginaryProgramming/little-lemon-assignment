@@ -38,11 +38,3 @@ export async function getMenuItems() {
   const result = await db.getAllAsync("SELECT * FROM menu_items");
   return result;
 }
-
-export async function searchMenuItems(searchTerm) {
-  const result = await db.getAllAsync(
-    "SELECT * FROM menu_items WHERE name LIKE ? OR description LIKE ?",
-    [`%${searchTerm}%`, `%${searchTerm}%`]
-  );
-  return result;
-}
